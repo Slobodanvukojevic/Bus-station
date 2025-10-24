@@ -1,4 +1,10 @@
 package com.busstation.repository;
 
-public class LineRepository {
+import com.busstation.model.Line;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface LineRepository extends JpaRepository<Line, Long> {
+    List<Line> findByStartStationAndEndStation(String startStation, String endStation);
 }
