@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: User
+Build-Jdk: Amazon Corretto version 22.0.1
+Implementation-Title: Bus Station Application
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.bus
+Main-Class: ${start-class}
+
