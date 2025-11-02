@@ -7,7 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
@@ -35,9 +37,17 @@ public class UserController {
         }
     }
 
-    @GetMapping("/")
+   /* @GetMapping("/")
     public String home(Authentication auth, Model model) {
         model.addAttribute("auth", auth);
         return "index";
+    }*/
+    @GetMapping("/")
+    public String home(Authentication auth, Model model) {
+        System.out.println(">>> Reached / (UserController.home), user = " +
+                (auth != null ? auth.getName() : "guest"));
+        model.addAttribute("auth", auth);
+        return "index";
     }
+
 }

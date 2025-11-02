@@ -52,26 +52,22 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(reg -> reg
-                        // Staticki resursi
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
-                        // Javne rute
-                        .requestMatchers("/login", "/register", "/departures", "/search").permitAll()
-                        // Admin panel
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // Sve ostalo zahteva login
-                        .anyRequest().authenticated()
+                        .requestMatchers("/**").permitAll() // ← dozvoljava sve rute privremeno
                 )
+
                 .formLogin(form -> form
-                        .loginPage("/login")             // JSP login stranica
+                        .loginPage("/login")               // forma za login (login.jsp)
+                        .loginProcessingUrl("/login")      // POST forma ide ovde
+                        .defaultSuccessUrl("/tickets", true)
+                        .failureUrl("/login?error=true")
                         .permitAll()
-                        .defaultSuccessUrl("/home", true) // Nakon logina ide na /home
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")             // ← posle logouta ide na index.jsp
                         .permitAll()
                 )
-                .csrf(csrf -> csrf.disable()); // privremeno isključen CSRF za testiranje
+                .csrf(csrf -> csrf.disable());         // isključi CSRF dok testiraš
 
         return http.build();
     }
