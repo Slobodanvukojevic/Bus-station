@@ -66,11 +66,11 @@ public class AdminController {
         return "redirect:/admin/departures/" + lineId;
     }
 
-    // Jasper hook – prihod za polazak (primer); kasnije ćemo generisati PDF
+
     @GetMapping("/report/revenue/{departureId}")
     public String revenue(@PathVariable Long departureId, Model model) {
         model.addAttribute("revenue", ticketService.revenueForDeparture(departureId));
         model.addAttribute("departureId", departureId);
-        return "admin/revenue"; // JSP koji samo prikaže broj; kasnije zameni Jasper PDF-om
+        return "admin/revenue";
     }
 }

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                                  http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="DeparturesReport" pageWidth="595" pageHeight="842"
+              columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="a1e33e42-2f85-4d39-8d08-0d07a5e37a55">
+
+    <parameter name="reportTitle" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["Izveštaj o polascima"]]></defaultValueExpression>
+    </parameter>
+
+    <queryString>
+        <![CDATA[
+            SELECT
+                d.id AS departure_id,
+                CONCAT(l.start_station, ' - ', l.end_station) AS route,
+                d.date AS departure_date,
+                d.time AS departure_time,
+                d.available_seats,
+                d.price
+            FROM departures d
+            JOIN bus_lines l ON d.line_id = l.id
+            ORDER BY d.date, d.time;
+        ]]>
+    </queryString>
+
+    <field name="departure_id" class="java.lang.Integer"/>
+    <field name="route" class="java.lang.String"/>
+    <field name="departure_date" class="java.sql.Date"/>
+    <field name="departure_time" class="java.sql.Time"/>
+    <field name="available_seats" class="java.lang.Integer"/>
+    <field name="price" class="java.math.BigDecimal"/>
+
+
+    <title>
+        <band height="60">
+            <staticText>
+                <reportElement x="0" y="10" width="555" height="30" uuid="2cb6d511-7b1f-4f30-aaa2-935e8c6e48cd"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[$P{reportTitle}]]></text>
+            </staticText>
+        </band>
+    </title>
+
+
+    <columnHeader>
+        <band height="25">
+            <line>
+                <reportElement x="0" y="24" width="555" height="1" uuid="f9877d5d-46e9-40b5-9fdc-cad45a517e83"/>
+            </line>
+            <staticText>
+                <reportElement x="0" y="5" width="50" height="20" uuid="col1"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle" />
+                <text><![CDATA[ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="50" y="5" width="160" height="20" uuid="col2"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle" />
+                <text><![CDATA[Ruta]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="210" y="5" width="90" height="20" uuid="col3"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle" />
+                <text><![CDATA[Datum]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="300" y="5" width="70" height="20" uuid="col4"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle" />
+                <text><![CDATA[Vreme]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="370" y="5" width="85" height="20" uuid="col5"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle" />
+                <text><![CDATA[Sedišta]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="455" y="5" width="100" height="20" uuid="col6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle" />
+                <text><![CDATA[Cena (RSD)]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+
+    <detail>
+        <band height="20">
+            <textField>
+                <reportElement x="0" y="0" width="50" height="20" uuid="f1"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{departure_id}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="50" y="0" width="160" height="20" uuid="f2"/>
+                <textElement verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{route}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="210" y="0" width="90" height="20" uuid="f3"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{departure_date}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="300" y="0" width="70" height="20" uuid="f4"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{departure_time}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="370" y="0" width="85" height="20" uuid="f5"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{available_seats}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.00">
+                <reportElement x="455" y="0" width="100" height="20" uuid="f6"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle"/>
+                <textFieldExpression><![CDATA[$F{price}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+
+    <pageFooter>
+        <band height="20">
+            <textField>
+                <reportElement x="455" y="0" width="100" height="20" uuid="footer"/>
+                <textElement textAlignment="Right">
+                    <font size="9"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Strana " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+</jasperReport>

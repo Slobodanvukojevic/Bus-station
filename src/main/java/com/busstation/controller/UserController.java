@@ -37,11 +37,12 @@ public class UserController {
         }
     }
 
-   /* @GetMapping("/")
-    public String home(Authentication auth, Model model) {
-        model.addAttribute("auth", auth);
-        return "index";
-    }*/
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
+
+
     @GetMapping("/")
     public String home(Authentication auth, Model model) {
         System.out.println(">>> Reached / (UserController.home), user = " +
@@ -49,5 +50,12 @@ public class UserController {
         model.addAttribute("auth", auth);
         return "index";
     }
+
+    @GetMapping("/index")
+    public String index(Authentication auth, Model model) {
+        model.addAttribute("auth", auth);
+        return "index";
+    }
+
 
 }

@@ -63,7 +63,7 @@ public class TicketService {
         ticketRepository.save(t);
     }
 
-    // Jasper hook – prihod po polasku (primer agregacije)
+
     public BigDecimal revenueForDeparture(Long departureId) {
         return ticketRepository.sumRevenueByDeparture(departureId);
     }
