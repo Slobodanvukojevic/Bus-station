@@ -1,6 +1,5 @@
 package com.busstation.controller;
 
-import com.busstation.model.User;
 import com.busstation.service.UserService;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,6 +16,12 @@ public class UserController {
     private final UserService userService;
     public UserController(UserService userService) { this.userService = userService; }
 
+    @GetMapping("/")
+    public String home(Authentication auth, Model model) {
+        model.addAttribute("auth", auth);
+        return "index";
+    }
+
     @GetMapping("/register")
     public String registerForm() {
         return "register";
@@ -28,8 +33,8 @@ public class UserController {
                            @RequestParam @NotBlank String password,
                            Model model) {
         try {
-            User u = userService.register(username, email, password);
-            model.addAttribute("msg", "Uspešna registracija za: " + u.getUsername());
+            userService.register(username, email, password);
+            model.addAttribute("msg", "Uspešna registracija. Možete se prijaviti.");
             return "login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
@@ -41,21 +46,4 @@ public class UserController {
     public String login() {
         return "login";
     }
-
-
-    @GetMapping("/")
-    public String home(Authentication auth, Model model) {
-        System.out.println(">>> Reached / (UserController.home), user = " +
-                (auth != null ? auth.getName() : "guest"));
-        model.addAttribute("auth", auth);
-        return "index";
-    }
-
-    @GetMapping("/index")
-    public String index(Authentication auth, Model model) {
-        model.addAttribute("auth", auth);
-        return "index";
-    }
-
-
 }

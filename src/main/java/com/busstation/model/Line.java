@@ -14,13 +14,15 @@ public class Line {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, length = 100)
     private String startStation;
 
-    @NotBlank @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, length = 100)
     private String endStation;
 
-    public Line() { }
+    public Line() {}
 
     public Line(String startStation, String endStation) {
         this.startStation = startStation;
@@ -35,4 +37,9 @@ public class Line {
 
     public String getEndStation() { return endStation; }
     public void setEndStation(String endStation) { this.endStation = endStation; }
+
+    @Transient
+    public String getDisplayName() {
+        return startStation + " - " + endStation;
+    }
 }

@@ -28,7 +28,7 @@ public class DepartureService {
     public Departure create(Long lineId, LocalDate date, LocalTime time, int seats, BigDecimal price) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("Line not found"));
-        return departureRepository.save(new Departure(line, date, time, seats, price));
+        return departureRepository.save(new Departure());
     }
 
     public List<Departure> search(LocalDate date, String start, String end, LocalTime from, LocalTime to) {
@@ -44,11 +44,18 @@ public class DepartureService {
         return departureRepository.findByLineAndDateRange(lineId, start, end);
     }
 
-    public void decrementSeat(Departure d) {
-        if (d.getAvailableSeats() <= 0) {
-            throw new IllegalStateException("No seats available");
+    public void decrementSeats(Departure d, int count) {
+        if (count <= 0) {
+            throw new IllegalArgumentException("Broj sedišta mora biti najmanje 1.");
         }
-        d.setAvailableSeats(d.getAvailableSeats() - 1);
+        if (d.getAvailableSeats() < count) {
+            throw new IllegalStateException("Nema dovoljno slobodnih mesta.");
+        }
+        d.setAvailableSeats(d.getAvailableSeats() - count);
         departureRepository.save(d);
     }
+    public List<Departure> findAll() {
+        return departureRepository.findAll();
+    }
+
 }

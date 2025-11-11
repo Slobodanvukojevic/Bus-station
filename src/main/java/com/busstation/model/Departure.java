@@ -1,9 +1,7 @@
 package com.busstation.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,28 +18,48 @@ public class Departure {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Line line;
 
-    @NotNull @Column(nullable = false)
+    @NotNull
+    @FutureOrPresent
+    @Column(nullable = false)
     private LocalDate date;
 
-    @NotNull @Column(nullable = false)
+    @NotNull
+    @Column(nullable = false)
     private LocalTime time;
 
-    @Min(0) @Column(nullable = false)
-    private int availableSeats = 0;
+    @NotBlank
+    @Column(nullable = false, length = 100)
+    private String driver;
 
-    @NotNull @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price = BigDecimal.ZERO;
+    @Min(1)
+    @Column(nullable = false)
+    private int capacity;
 
-    public Departure() { }
+    @Min(0)
+    @Column(nullable = false)
+    private int availableSeats;
 
-    public Departure(Line line, LocalDate date, LocalTime time, int availableSeats, BigDecimal price) {
+    @NotNull
+    @DecimalMin("0.00")
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @Version
+    private int version;
+
+    public Departure() {}
+
+    public Departure(Line line, LocalDate date, LocalTime time, String driver, int capacity, BigDecimal price) {
         this.line = line;
         this.date = date;
         this.time = time;
-        this.availableSeats = availableSeats;
+        this.driver = driver;
+        this.capacity = capacity;
+        this.availableSeats = capacity;
         this.price = price;
     }
 
@@ -57,9 +75,18 @@ public class Departure {
     public LocalTime getTime() { return time; }
     public void setTime(LocalTime time) { this.time = time; }
 
+    public String getDriver() { return driver; }
+    public void setDriver(String driver) { this.driver = driver; }
+
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
+
     public int getAvailableSeats() { return availableSeats; }
     public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
 
     public BigDecimal getPrice() { return price; }
     public void setPrice(BigDecimal price) { this.price = price; }
+
+    public int getVersion() { return version; }
+    public void setVersion(int version) { this.version = version; }
 }

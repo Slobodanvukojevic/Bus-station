@@ -17,26 +17,28 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank @Size(min = 3, max = 50)
+    @NotBlank
+    @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true)
     private String username;
 
-    @NotBlank @Size(min = 6, max = 255)
+    @NotBlank
+    @Size(min = 6, max = 255)
     @Column(nullable = false)
     private String password;
 
-    @Email @NotBlank
+    @Email
+    @NotBlank
     @Column(nullable = false, unique = true)
     private String email;
 
-    // ROLE_USER, ROLE_ADMIN
-    @NotBlank
-    @Column(nullable = false)
-    private String role = "ROLE_USER";
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role = Role.ROLE_USER;
 
     public User() { }
 
-    public User(String username, String password, String email, String role) {
+    public User(String username, String password, String email, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -55,6 +57,6 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }

@@ -2,8 +2,8 @@
 <html>
 <head><title>Error</title></head>
 <body>
-<h2>An error occurred mili moj</h2>
-<p>${message}</p>
-<a href="/">Back to Home</a>
+<h2>An error occurred</h2>
+<p style="color:red;">${message}</p>
+<a href="${pageContext.request.contextPath}/">Back to Home</a>
 </body>
 </html>

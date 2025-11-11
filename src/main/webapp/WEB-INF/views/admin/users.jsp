@@ -12,5 +12,6 @@
         </tr>
     </c:forEach>
 </table>
+<p><a href="${pageContext.request.contextPath}/admin/dashboard">Back</a></p>
 </body>
 </html>

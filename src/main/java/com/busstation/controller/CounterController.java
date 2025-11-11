@@ -1,0 +1,58 @@
+package com.busstation.controller;
+
+import com.busstation.model.User;
+import com.busstation.service.DepartureService;
+import com.busstation.service.TicketService;
+import com.busstation.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+@RequestMapping("/counter")
+@PreAuthorize("hasRole('ROLE_COUNTER')")
+public class CounterController {
+
+    private final DepartureService departureService;
+    private final TicketService ticketService;
+    private final UserService userService;
+
+    public CounterController(DepartureService departureService,
+                             TicketService ticketService,
+                             UserService userService) {
+        this.departureService = departureService;
+        this.ticketService = ticketService;
+        this.userService = userService;
+    }
+
+    // Prikaz prodajnog ekrana za radnika
+    @GetMapping("/sales")
+    public String showSalesPage(Model model) {
+        model.addAttribute("departures", departureService.findAll());
+        model.addAttribute("users", userService.findAllUsers());
+        return "counter/sales";
+    }
+
+    // Akcija prodaje karte korisniku
+    @PostMapping("/sell")
+    public String sellTicket(Authentication auth,
+                             @RequestParam Long departureId,
+                             @RequestParam int seatCount,
+                             Model model) {
+        try {
+            User counter = userService.findByUsername(auth.getName()).orElseThrow();
+            ticketService.sellByCounter(counter.getId(), departureId, seatCount);
+            model.addAttribute("msg", "Karta uspešno prodata od strane: " + counter.getUsername());
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+        }
+
+        model.addAttribute("departures", departureService.findAll());
+        return "counter/sales";
+    }
+}

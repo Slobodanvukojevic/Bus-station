@@ -32,7 +32,11 @@ public class TicketService {
         this.departureService = departureService;
     }
 
-    public Ticket buy(Long userId, Long departureId) {
+    public Ticket buy(Long userId, Long departureId, int seatCount) {
+        if (seatCount <= 0) {
+            throw new IllegalArgumentException("Broj sedišta mora biti najmanje 1.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -43,26 +47,51 @@ public class TicketService {
             throw new IllegalStateException("User already has an active ticket for this departure");
         }
 
-        departureService.decrementSeat(dep);
-        Ticket t = new Ticket(user, dep, dep.getPrice());
+// provera kapaciteta polaska
+        if (dep.getAvailableSeats() < seatCount) {
+            throw new IllegalStateException("Nema dovoljno slobodnih sedišta.");
+        }
+
+// smanji broj slobodnih sedišta
+        departureService.decrementSeats(dep, seatCount);
+
+// napravi kartu
+        Ticket t = new Ticket(user, dep, seatCount, dep.getPrice());
         t.setPurchaseDate(LocalDateTime.now());
         return ticketRepository.save(t);
     }
 
+    @Transactional
+    public Ticket sellByCounter(Long counterId, Long departureId, int seatCount) {
+        // Radnik je upisan kao "user_id"
+        return buy(counterId, departureId, seatCount);
+    }
+
     public List<Ticket> myTickets(User user) {
+        // vraća sve karte za korisnika, najnovije prve
         return ticketRepository.findByUserOrderByPurchaseDateDesc(user);
     }
 
     public void cancel(Long ticketId, Long userId) {
         Ticket t = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new IllegalArgumentException("Ticket not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Karta nije pronađena."));
+
         if (!t.getUser().getId().equals(userId)) {
-            throw new SecurityException("Not owner");
+            throw new SecurityException("Nemate pravo da otkažete ovu kartu.");
         }
+
+        // zabrana otkazivanja manje od 24h pre polaska
+        LocalDateTime departureTime = LocalDateTime.of(
+                t.getDeparture().getDate(),
+                t.getDeparture().getTime()
+        );
+        if (LocalDateTime.now().isAfter(departureTime.minusHours(24))) {
+            throw new IllegalStateException("Kartu nije moguće otkazati manje od 24h pre polaska.");
+        }
+
         t.setStatus(Ticket.Status.CANCELLED);
         ticketRepository.save(t);
     }
-
 
     public BigDecimal revenueForDeparture(Long departureId) {
         return ticketRepository.sumRevenueByDeparture(departureId);

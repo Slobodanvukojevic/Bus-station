@@ -2,7 +2,6 @@ package com.busstation.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -15,19 +14,19 @@ public class SearchCriteria {
     private String end;
 
     @NotNull
-    private LocalDate date;
+    private LocalDate date = LocalDate.now();
 
     @NotNull
-    private LocalTime timeFrom;
+    private LocalTime timeFrom = LocalTime.of(0, 0);
 
     @NotNull
-    private LocalTime timeTo;
+    private LocalTime timeTo = LocalTime.of(23, 59);
 
     public String getStart() { return start; }
-    public void setStart(String start) { this.start = start; }
+    public void setStart(String start) { this.start = start.trim(); }
 
     public String getEnd() { return end; }
-    public void setEnd(String end) { this.end = end; }
+    public void setEnd(String end) { this.end = end.trim(); }
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
@@ -37,4 +36,9 @@ public class SearchCriteria {
 
     public LocalTime getTimeTo() { return timeTo; }
     public void setTimeTo(LocalTime timeTo) { this.timeTo = timeTo; }
+
+    // pomoćna metoda za validaciju intervala
+    public boolean isValidTimeRange() {
+        return timeFrom.isBefore(timeTo) || timeFrom.equals(timeTo);
+    }
 }
