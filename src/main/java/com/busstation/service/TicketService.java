@@ -1,5 +1,6 @@
 package com.busstation.service;
 
+import com.busstation.dto.TicketReportDTO;
 import com.busstation.model.Departure;
 import com.busstation.model.Ticket;
 import com.busstation.model.User;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -43,9 +45,7 @@ public class TicketService {
         Departure dep = departureRepository.findById(departureId)
                 .orElseThrow(() -> new IllegalArgumentException("Departure not found"));
 
-        if (ticketRepository.existsActiveForDeparture(user, departureId)) {
-            throw new IllegalStateException("User already has an active ticket for this departure");
-        }
+
 
 // provera kapaciteta polaska
         if (dep.getAvailableSeats() < seatCount) {
@@ -61,6 +61,13 @@ public class TicketService {
         return ticketRepository.save(t);
     }
 
+    public long countTicketsForDeparture(Long departureId) {
+        return ticketRepository.countActiveSeatsByDeparture(departureId);
+    }
+    public List<TicketReportDTO> getTicketsForReport(Long departureId) {
+        return ticketRepository.findTicketsForReport(departureId);
+    }
+
     @Transactional
     public Ticket sellByCounter(Long counterId, Long departureId, int seatCount) {
         // Radnik je upisan kao "user_id"
@@ -72,6 +79,12 @@ public class TicketService {
         return ticketRepository.findByUserOrderByPurchaseDateDesc(user);
     }
 
+    public List<Ticket> getAllTickets() {
+        return ticketRepository.findAll().stream()
+                .sorted((t1, t2) -> t2.getPurchaseDate().compareTo(t1.getPurchaseDate()))
+                .collect(Collectors.toList());
+    }
+
     public void cancel(Long ticketId, Long userId) {
         Ticket t = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new IllegalArgumentException("Karta nije pronađena."));
@@ -80,14 +93,13 @@ public class TicketService {
             throw new SecurityException("Nemate pravo da otkažete ovu kartu.");
         }
 
-        // zabrana otkazivanja manje od 24h pre polaska
-        LocalDateTime departureTime = LocalDateTime.of(
-                t.getDeparture().getDate(),
-                t.getDeparture().getTime()
-        );
-        if (LocalDateTime.now().isAfter(departureTime.minusHours(24))) {
-            throw new IllegalStateException("Kartu nije moguće otkazati manje od 24h pre polaska.");
-        }
+        Departure departure = t.getDeparture();
+        departure.setAvailableSeats(departure.getAvailableSeats() + t.getSeatCount());
+        departureRepository.save(departure);
+
+        System.out.println("Returned " + t.getSeatCount() + " seats. New available: " + departure.getAvailableSeats());
+
+
 
         t.setStatus(Ticket.Status.CANCELLED);
         ticketRepository.save(t);

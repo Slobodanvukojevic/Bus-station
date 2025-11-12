@@ -61,6 +61,11 @@
             <version>3.0.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+        </dependency>
+
         <!-- JasperReports -->
         <dependency>
             <groupId>net.sf.jasperreports</groupId>

@@ -8,10 +8,13 @@
     <tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th></tr>
     <c:forEach var="u" items="${users}">
         <tr>
-            <td>${u.id}</td><td>${u.username}</td><td>${u.email}</td><td>${u.role}</td>
+            <td>${u.id}</td>
+            <td>${u.username}</td>
+            <td>${u.email}</td>
+            <td>${u.role}</td>
         </tr>
     </c:forEach>
 </table>
-<p><a href="${pageContext.request.contextPath}/admin/dashboard">Back</a></p>
+<p><a href="${pageContext.request.contextPath}/admin">Back to Dashboard</a></p>
 </body>
 </html>

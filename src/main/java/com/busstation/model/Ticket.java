@@ -17,6 +17,9 @@ import java.util.UUID;
 public class Ticket {
 
 
+    public Ticket() {
+
+    }
 
     public enum Status { ACTIVE, CANCELLED, USED }
 

@@ -1,15 +1,34 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
-<head><title>Buy Ticket</title></head>
+<head><title>Kupovina karte</title></head>
 <body>
-<h2>Buy Ticket</h2>
+<h2>Kupovina karte</h2>
 
-<form method="post" action="${pageContext.request.contextPath}/tickets/buy">
-    <input type="hidden" name="departureId" value="${departure.id}"/>
-    <label>Seats:</label><input type="number" name="seatCount" min="1" value="1"/><br/><br/>
-    <input type="submit" value="Confirm Purchase"/>
-</form>
+<c:if test="${not empty error}">
+    <p style="color:red;">${error}</p>
+</c:if>
 
-<p><a href="${pageContext.request.contextPath}/departures/list">Back to Departures</a></p>
+<c:if test="${not empty departure}">
+    <p>
+        <strong>Linija:</strong> ${departure.line.startStation} → ${departure.line.endStation}<br/>
+        <strong>Datum:</strong> ${departure.date}<br/>
+        <strong>Vreme:</strong> ${departure.time}<br/>
+        <strong>Cena po sedištu:</strong> ${departure.price} RSD<br/>
+        <strong>Slobodna mesta:</strong> ${departure.availableSeats}
+    </p>
+
+    <form method="post" action="${pageContext.request.contextPath}/tickets/buy">
+        <input type="hidden" name="departureId" value="${departure.id}"/>
+
+        <label>Broj sedišta:</label>
+        <input type="number" name="seatCount" min="1" max="${departure.availableSeats}" value="1" required/>
+        <br/><br/>
+
+        <input type="submit" value="Potvrdi kupovinu"/>
+    </form>
+</c:if>
+
+<p><a href="${pageContext.request.contextPath}/departures/list">Nazad na polaske</a></p>
 </body>
 </html>

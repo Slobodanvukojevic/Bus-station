@@ -4,6 +4,7 @@ import com.busstation.model.Departure;
 import com.busstation.model.Line;
 import com.busstation.repository.DepartureRepository;
 import com.busstation.repository.LineRepository;
+import com.busstation.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,17 +19,37 @@ public class DepartureService {
 
     private final DepartureRepository departureRepository;
     private final LineRepository lineRepository;
+    private final TicketRepository ticketRepository;
 
     public DepartureService(DepartureRepository departureRepository,
-                            LineRepository lineRepository) {
+                            LineRepository lineRepository, TicketRepository ticketRepository) {
         this.departureRepository = departureRepository;
         this.lineRepository = lineRepository;
+        this.ticketRepository = ticketRepository;
     }
 
-    public Departure create(Long lineId, LocalDate date, LocalTime time, int seats, BigDecimal price) {
+    public Departure create(Long lineId, LocalDate date, LocalTime time, String driver, int seats, BigDecimal price) {
         Line line = lineRepository.findById(lineId)
                 .orElseThrow(() -> new IllegalArgumentException("Line not found"));
-        return departureRepository.save(new Departure());
+
+        Departure departure = new Departure(line, date, time, driver, seats, price);
+        return departureRepository.save(departure);
+    }
+
+    public void delete(Long id) {
+        System.out.println("=== DepartureService.delete ===");
+        System.out.println("Deleting departure: " + id);
+
+        Departure departure = departureRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Departure not found"));
+
+        departureRepository.delete(departure);
+        System.out.println("Departure deleted successfully!");
+    }
+
+    public long countTicketsForDeparture(Long departureId) {
+
+        return ticketRepository.countActiveSeatsByDeparture(departureId);
     }
 
     public List<Departure> search(LocalDate date, String start, String end, LocalTime from, LocalTime to) {

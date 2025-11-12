@@ -3,37 +3,52 @@
 <html>
 <head><title>My Tickets</title></head>
 <body>
-<h2>My Tickets</h2>
+<h2>Moje karte</h2>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Route</th>
-        <th>Date</th>
-        <th>Time</th>
-        <th>Seats</th>
-        <th>Price</th>
-        <th>Status</th>
-        <th>Action</th>
-    </tr>
-    <c:forEach var="t" items="${tickets}">
+<c:if test="${empty tickets}">
+    <p>Nemate kupljenih karata.</p>
+</c:if>
+
+<c:if test="${not empty tickets}">
+    <table border="1">
+        <thead>
         <tr>
-            <td>${t.id}</td>
-            <td>${t.departure.line.startStation} → ${t.departure.line.endStation}</td>
-            <td>${t.departure.date}</td>
-            <td>${t.departure.time}</td>
-            <td>${t.seatCount}</td>
-            <td>${t.price}</td>
-            <td>${t.status}</td>
-            <td>
-                <c:if test="${t.status eq 'ACTIVE'}">
-                    <a href="${pageContext.request.contextPath}/tickets/cancel/${t.id}">Cancel</a>
-                </c:if>
-            </td>
+            <th>Šifra</th>
+            <th>Linija</th>
+            <th>Datum</th>
+            <th>Vreme</th>
+            <th>Sedišta</th>
+            <th>Cena</th>
+            <th>Status</th>
+            <th>Akcija</th>
         </tr>
-    </c:forEach>
-</table>
+        </thead>
+        <tbody>
+        <c:forEach var="ticket" items="${tickets}">
+            <tr>
+                <td>${ticket.ticketCode}</td>
+                <td>${ticket.departure.line.startStation} → ${ticket.departure.line.endStation}</td>
+                <td>${ticket.departure.date}</td>
+                <td>${ticket.departure.time}</td>
+                <td>${ticket.seatCount}</td>
+                <td>${ticket.priceAtPurchase}</td>
+                <td>${ticket.status}</td>
+                <td>
+                    <c:if test="${ticket.status == 'ACTIVE'}">
+                        <form method="post" action="${pageContext.request.contextPath}/tickets/cancel/${ticket.id}" style="display:inline;">
+                            <input type="submit" value="Otkaži" onclick="return confirm('Da li ste sigurni?');"/>
+                        </form>
+                    </c:if>
+                </td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
+</c:if>
 
-<p><a href="${pageContext.request.contextPath}/">Home</a></p>
+<p>
+    <a href="${pageContext.request.contextPath}/tickets/search">Kupi novu kartu</a> |
+    <a href="${pageContext.request.contextPath}/">Početna</a>
+</p>
 </body>
 </html>

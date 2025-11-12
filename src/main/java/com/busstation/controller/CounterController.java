@@ -1,5 +1,6 @@
 package com.busstation.controller;
 
+import com.busstation.model.Ticket;
 import com.busstation.model.User;
 import com.busstation.service.DepartureService;
 import com.busstation.service.TicketService;
@@ -12,10 +13,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/counter")
-@PreAuthorize("hasRole('ROLE_COUNTER')")
+@PreAuthorize("hasAuthority('ROLE_COUNTER')")
 public class CounterController {
 
     private final DepartureService departureService;
@@ -43,16 +47,60 @@ public class CounterController {
     public String sellTicket(Authentication auth,
                              @RequestParam Long departureId,
                              @RequestParam int seatCount,
-                             Model model) {
+                             RedirectAttributes redirectAttributes) {
+        System.out.println("=== COUNTER SELL TICKET ===");
+
         try {
             User counter = userService.findByUsername(auth.getName()).orElseThrow();
             ticketService.sellByCounter(counter.getId(), departureId, seatCount);
-            model.addAttribute("msg", "Karta uspešno prodata od strane: " + counter.getUsername());
+
+            redirectAttributes.addFlashAttribute("msg", "Karta uspešno prodata!");
+            System.out.println("Ticket sold by: " + counter.getUsername());
         } catch (Exception e) {
+            System.err.println("Error selling ticket: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/counter/sales";
+    }
+
+    // Pregled svih prodatih karata
+    @GetMapping("/tickets")
+    public String viewAllTickets(Model model) {
+        System.out.println("=== VIEW ALL TICKETS (COUNTER) ===");
+
+        List<Ticket> allTickets = ticketService.getAllTickets();
+        model.addAttribute("tickets", allTickets);
+
+        System.out.println("Total tickets: " + allTickets.size());
+        return "counter/tickets";
+    }
+
+    // Pregled karata za određenog korisnika
+    @GetMapping("/tickets/user")
+    public String viewUserTickets(@RequestParam Long userId, Model model) {
+        System.out.println("=== VIEW USER TICKETS (COUNTER) ===");
+        System.out.println("User ID: " + userId);
+
+        try {
+            User user = userService.findAllUsers().stream()
+                    .filter(u -> u.getId().equals(userId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Korisnik nije pronađen"));
+
+            List<Ticket> userTickets = ticketService.myTickets(user);
+
+            model.addAttribute("tickets", userTickets);
+            model.addAttribute("selectedUser", user);
+
+            System.out.println("User tickets: " + userTickets.size());
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
             model.addAttribute("error", e.getMessage());
         }
 
-        model.addAttribute("departures", departureService.findAll());
-        return "counter/sales";
+        return "counter/tickets";
     }
 }

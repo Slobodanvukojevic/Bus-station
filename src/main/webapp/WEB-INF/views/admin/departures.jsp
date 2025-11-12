@@ -6,18 +6,25 @@
 <h2>Manage Departures</h2>
 
 <!-- Add Departure -->
-<form method="post" action="${pageContext.request.contextPath}/admin/departures/add">
-    <label>Line:</label>
-    <select name="lineId">
-        <c:forEach var="l" items="${lines}">
-            <option value="${l.id}">${l.startStation} → ${l.endStation}</option>
-        </c:forEach>
-    </select><br/>
-    <label>Date:</label><input type="date" name="date" required/><br/>
-    <label>Time:</label><input type="time" name="time" required/><br/>
-    <label>Available Seats:</label><input type="number" name="availableSeats" min="1" required/><br/>
-    <label>Price (RSD):</label><input type="number" step="0.01" name="price" required/><br/><br/>
-    <input type="submit" value="Add Departure"/>
+<form method="post" action="${pageContext.request.contextPath}/admin/departures">
+    <input type="hidden" name="lineId" value="${line.id}"/>
+
+    <label>Datum:</label>
+    <input type="date" name="date" required/><br/>
+
+    <label>Vreme:</label>
+    <input type="time" name="time" required/><br/>
+
+    <label>Vozač:</label>
+    <input type="text" name="driver" required/><br/>
+
+    <label>Broj sedišta:</label>
+    <input type="number" name="seats" min="1" required/><br/>
+
+    <label>Cena:</label>
+    <input type="number" step="0.01" name="price" required/><br/>
+
+    <button type="submit">Dodaj polazak</button>
 </form>
 
 <c:if test="${not empty msg}">
@@ -47,12 +54,15 @@
             <td>${d.availableSeats}</td>
             <td>${d.price}</td>
             <td>
-                <a href="${pageContext.request.contextPath}/admin/departures/delete/${d.id}">Delete</a>
+                <a href="${pageContext.request.contextPath}/admin/revenue/${d.id}">Prihod</a> |
+                <form method="post" action="${pageContext.request.contextPath}/admin/departures/delete/${d.id}" style="display:inline;">
+                    <input type="submit" value="Delete" onclick="return confirm('Da li ste sigurni?');"/>
+                </form>
             </td>
         </tr>
     </c:forEach>
 </table>
 
-<p><a href="${pageContext.request.contextPath}/admin/dashboard">Back</a></p>
+<p><a href="${pageContext.request.contextPath}/admin">Back to Dashboard</a></p>
 </body>
 </html>

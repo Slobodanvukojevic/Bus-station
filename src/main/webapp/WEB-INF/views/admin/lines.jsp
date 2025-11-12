@@ -6,11 +6,11 @@
 <h2>Manage Bus Lines</h2>
 
 <!-- Form for adding a new line -->
-<form method="post" action="${pageContext.request.contextPath}/admin/lines/add">
+<form method="post" action="${pageContext.request.contextPath}/admin/lines">
     <label>Start Station:</label>
-    <input type="text" name="startStation" required/><br/>
+    <input type="text" name="start" required/><br/>
     <label>End Station:</label>
-    <input type="text" name="endStation" required/><br/><br/>
+    <input type="text" name="end" required/><br/><br/>
     <input type="submit" value="Add Line"/>
 </form>
 
@@ -37,12 +37,14 @@
             <td>${l.startStation}</td>
             <td>${l.endStation}</td>
             <td>
-                <a href="${pageContext.request.contextPath}/admin/lines/delete/${l.id}">Delete</a>
+                <form method="post" action="${pageContext.request.contextPath}/admin/lines/delete/${l.id}" style="display:inline;">
+                    <input type="submit" value="Delete"/>
+                </form>
             </td>
         </tr>
     </c:forEach>
 </table>
 
-<p><a href="${pageContext.request.contextPath}/admin/dashboard">Back</a></p>
+<p><a href="${pageContext.request.contextPath}/admin">Back to Dashboard</a></p>
 </body>
 </html>

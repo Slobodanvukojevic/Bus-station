@@ -1,10 +1,12 @@
 package com.busstation.repository;
 
+import com.busstation.dto.TicketReportDTO;
 import com.busstation.model.Ticket;
 import com.busstation.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +22,20 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     """)
     List<Ticket> findByUserAndStatus(@Param("user") User user,
                                      @Param("status") Ticket.Status status);
-
+    @Query("""
+    SELECT new com.busstation.dto.TicketReportDTO(
+        t.ticketCode,
+        t.user.username,
+        t.seatCount,
+        t.priceAtPurchase,
+        CAST(t.purchaseDate AS string)
+    )
+    FROM Ticket t
+    WHERE t.departure.id = :departureId
+      AND t.status = 'ACTIVE'
+    ORDER BY t.purchaseDate DESC
+""")
+    List<TicketReportDTO> findTicketsForReport(@Param("departureId") Long departureId);
     @Query("""
         SELECT CASE WHEN COUNT(t) > 0 THEN TRUE ELSE FALSE END
         FROM Ticket t

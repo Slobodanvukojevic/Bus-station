@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head><title>Login</title></head>
 <body>
@@ -12,9 +13,12 @@
     <input type="submit" value="Login"/>
 </form>
 
-<c:if test="${not empty error}">
-    <p style="color:red;">${error}</p>
+
+
+<c:if test="${param.error ne null}">
+    <p style="color:red;">Invalid username or password.</p>
 </c:if>
+
 
 <p><a href="${pageContext.request.contextPath}/register">Create new account</a></p>
 </body>
