@@ -17,7 +17,7 @@ public class DepartureController {
         this.departureService = departureService;
     }
 
-    // /departures/list za list.jsp
+
     @GetMapping("/departures/list")
     public String listDepartures(Model model) {
         List<Departure> departures = departureService.findAll();

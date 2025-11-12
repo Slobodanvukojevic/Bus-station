@@ -33,19 +33,19 @@ public class AdminController {
     private final LineService lineService;
     private final DepartureService departureService;
     private final TicketService ticketService;
-    private final UserService userService;  // DODAJ OVO
+    private final UserService userService;
 
     public AdminController(LineService lineService,
                            DepartureService departureService,
                            TicketService ticketService,
-                           UserService userService) {  // DODAJ OVO
+                           UserService userService) {
         this.lineService = lineService;
         this.departureService = departureService;
         this.ticketService = ticketService;
-        this.userService = userService;  // DODAJ OVO
+        this.userService = userService;
     }
 
-    // Admin dashboard
+
     @GetMapping
     public String adminHome(Model model) {
         System.out.println("=== ADMIN DASHBOARD ===");
@@ -53,7 +53,16 @@ public class AdminController {
         return "admin/dashboard";
     }
 
-    // List all lines
+
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+        System.out.println("=== LIST USERS ===");
+        List<User> users = userService.findAllUsers();
+        model.addAttribute("users", users);
+        return "admin/users";
+    }
+
+
     @GetMapping("/lines")
     public String listLines(Model model) {
         System.out.println("=== LIST LINES ===");
@@ -62,7 +71,6 @@ public class AdminController {
         return "admin/lines";
     }
 
-    // Create new line
     @PostMapping("/lines")
     public String createLine(@RequestParam @NotBlank String start,
                              @RequestParam @NotBlank String end,
@@ -84,7 +92,6 @@ public class AdminController {
         return "redirect:/admin/lines";
     }
 
-    // Delete line
     @PostMapping("/lines/delete/{id}")
     public String deleteLine(@PathVariable Long id, Model model) {
         System.out.println("=== DELETE LINE ===");
@@ -103,7 +110,6 @@ public class AdminController {
         return "redirect:/admin/lines";
     }
 
-    // List departures for a line
     @GetMapping("/departures/{lineId}")
     public String listDepartures(@PathVariable Long lineId,
                                  @RequestParam(required = false) String startDate,
@@ -134,7 +140,6 @@ public class AdminController {
         return "admin/departures";
     }
 
-    // Create new departure
     @PostMapping("/departures")
     public String createDeparture(@RequestParam @NotNull Long lineId,
                                   @RequestParam @NotNull String date,
@@ -171,17 +176,6 @@ public class AdminController {
         return "redirect:/admin/departures/" + lineId;
     }
 
-    // List all users
-    @GetMapping("/users")
-    public String listUsers(Model model) {
-        System.out.println("=== LIST USERS ===");
-        List<User> users = userService.findAllUsers();
-        model.addAttribute("users", users);
-        return "admin/users";
-    }
-
-    // Delete departure
-    // Delete departure
     @PostMapping("/departures/delete/{id}")
     public String deleteDeparture(@PathVariable Long id, Model model) {
         System.out.println("=== DELETE DEPARTURE ===");
@@ -191,7 +185,6 @@ public class AdminController {
             Departure dep = departureService.get(id);
             Long lineId = dep.getLine().getId();
 
-            // Proveri da li ima karata
             long ticketCount = ticketService.countTicketsForDeparture(id);
             if (ticketCount > 0) {
                 model.addAttribute("error", "Ne možete obrisati polazak koji ima " + ticketCount + " prodatih karata!");
@@ -211,7 +204,7 @@ public class AdminController {
         }
     }
 
-    // Revenue for departure
+
     @GetMapping("/revenue/{departureId}")
     public String revenueForDeparture(@PathVariable Long departureId, Model model) {
         System.out.println("=== REVENUE FOR DEPARTURE ===");
@@ -240,11 +233,9 @@ public class AdminController {
             BigDecimal revenue = ticketService.revenueForDeparture(departureId);
             List<TicketReportDTO> tickets = ticketService.getTicketsForReport(departureId);
 
-            // Load JRXML
             InputStream jrxmlInput = getClass().getResourceAsStream("/reports/revenue_report.jrxml");
             JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlInput);
 
-            // Parameters
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("departureId", departureId);
             parameters.put("lineInfo", departure.getLine().getDisplayName());
@@ -252,13 +243,10 @@ public class AdminController {
             parameters.put("departureTime", departure.getTime().toString());
             parameters.put("totalRevenue", revenue);
 
-            // Data source
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(tickets);
 
-            // Fill report
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-            // Export to PDF
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "attachment; filename=revenue_report_" + departureId + ".pdf");
 

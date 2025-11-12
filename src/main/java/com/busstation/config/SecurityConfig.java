@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,7 +35,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Pretpostavljam da u User imaš enum Role { ADMIN, COUNTER, USER }
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userRepository.findByUsername(username)
@@ -49,11 +50,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // sve osnovne stranice su javne
                         .requestMatchers("/", "/index", "/login", "/register", "/error").permitAll()
-                        // za sada ostalo takođe javno, da ne pravimo petlju dok ne testiramo
                         .anyRequest().permitAll()
                 )
                 .formLogin(form -> form

@@ -37,8 +37,5 @@ public class SearchCriteria {
     public LocalTime getTimeTo() { return timeTo; }
     public void setTimeTo(LocalTime timeTo) { this.timeTo = timeTo; }
 
-    // pomoćna metoda za validaciju intervala
-    public boolean isValidTimeRange() {
-        return timeFrom.isBefore(timeTo) || timeFrom.equals(timeTo);
-    }
+
 }

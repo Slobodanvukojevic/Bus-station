@@ -23,7 +23,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // registracija putnika
     public User register(String username, String email, String rawPassword) {
         if (userRepository.existsByUsername(username))
             throw new IllegalArgumentException("Korisničko ime već postoji.");
@@ -41,7 +40,6 @@ public class UserService {
         return userRepository.save(u);
     }
 
-    // dodavanje šalter radnika (koristi admin)
     public User createCounterUser(String username, String email, String rawPassword) {
         if (userRepository.existsByUsername(username))
             throw new IllegalArgumentException("Korisničko ime već postoji.");
@@ -55,7 +53,6 @@ public class UserService {
         return userRepository.save(u);
     }
 
-    // dodavanje administratora (samo jednom ručno ili preko SQL)
     public User createAdmin(String username, String email, String rawPassword) {
         if (userRepository.existsByUsername(username))
             throw new IllegalArgumentException("Korisničko ime već postoji.");

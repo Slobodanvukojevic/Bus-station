@@ -47,15 +47,12 @@ public class TicketService {
 
 
 
-// provera kapaciteta polaska
         if (dep.getAvailableSeats() < seatCount) {
             throw new IllegalStateException("Nema dovoljno slobodnih sedišta.");
         }
 
-// smanji broj slobodnih sedišta
         departureService.decrementSeats(dep, seatCount);
 
-// napravi kartu
         Ticket t = new Ticket(user, dep, seatCount, dep.getPrice());
         t.setPurchaseDate(LocalDateTime.now());
         return ticketRepository.save(t);
@@ -103,6 +100,30 @@ public class TicketService {
 
         t.setStatus(Ticket.Status.CANCELLED);
         ticketRepository.save(t);
+    }
+
+    @Transactional
+    public void cancelByCounter(Long ticketId) {
+        System.out.println("=== TicketService.cancelByCounter ===");
+        System.out.println("Ticket ID: " + ticketId);
+
+        Ticket t = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Karta nije pronađena."));
+
+        if (t.getStatus() != Ticket.Status.ACTIVE) {
+            throw new IllegalStateException("Karta je već otkazana ili iskorišćena.");
+        }
+
+        Departure departure = t.getDeparture();
+        departure.setAvailableSeats(departure.getAvailableSeats() + t.getSeatCount());
+        departureRepository.save(departure);
+
+        System.out.println("Returned " + t.getSeatCount() + " seats. New available: " + departure.getAvailableSeats());
+
+        t.setStatus(Ticket.Status.CANCELLED);
+        ticketRepository.save(t);
+
+        System.out.println("Ticket cancelled by counter!");
     }
 
     public BigDecimal revenueForDeparture(Long departureId) {
